@@ -11,6 +11,6 @@ dependencies = ["av>=17.0.0"]
 Repository = "https://github.com/cheney2013/ComfyUI-H3-LivePreview"
 
 [tool.comfy]
-PublisherId = ""
+PublisherId = "lanlan"
 DisplayName = "H3 Live Preview"
 Icon = ""
