@@ -45,6 +45,41 @@ def _low_memory() -> bool:
         return False
 
 
+WEIGHTS_URL = "https://github.com/madebyollin/taehv/raw/main/safetensors/taeh3.safetensors"
+WEIGHTS_SHA256 = "4fd022bfcab08772fe0536b17ea1a3bbb5625be11e397868d1c5d891863d4c13"
+
+
+def _ensure_weights() -> bool:
+    """taeh3 is in models/vae_approx, downloading it there on first use if it is not."""
+    if any(f.startswith("taeh3") for f in folder_paths.get_filename_list("vae_approx")):
+        return True
+    import hashlib
+    import urllib.request
+    folder = Path(folder_paths.get_folder_paths("vae_approx")[0])
+    target = folder / "taeh3.safetensors"
+    partial = folder / "taeh3.safetensors.part"
+    try:
+        folder.mkdir(parents=True, exist_ok=True)
+        log.info("downloading taeh3 (22 MB) to %s from %s", target, WEIGHTS_URL)
+        digest = hashlib.sha256()
+        with urllib.request.urlopen(WEIGHTS_URL, timeout=60) as r, open(partial, "wb") as out:
+            while True:
+                block = r.read(1 << 20)
+                if not block:
+                    break
+                digest.update(block)
+                out.write(block)
+        if digest.hexdigest() != WEIGHTS_SHA256:
+            raise ValueError("checksum mismatch")
+        partial.replace(target)
+        return True
+    except Exception as e:  # noqa: BLE001 -- a preview must never break a render
+        partial.unlink(missing_ok=True)
+        log.warning("could not download taeh3 (%s); live preview is off. Download %s and place it in %s",
+                    e, WEIGHTS_URL, folder)
+        return False
+
+
 def _is_h3(model) -> bool:
     try:
         fmt = model.model.latent_format
@@ -72,6 +107,9 @@ class _Worker:
         threading.Thread(target=self._loop, daemon=True, name="h3-live-preview").start()
 
     def _start(self):
+        if not _ensure_weights():
+            self.disabled = True
+            raise RuntimeError("taeh3 weights are not available")
         extra = {}
         if sys.platform == "win32":
             extra["creationflags"] = subprocess.BELOW_NORMAL_PRIORITY_CLASS | subprocess.CREATE_NO_WINDOW
@@ -123,7 +161,8 @@ class _Worker:
                         try:
                             self._start()
                         except Exception:  # noqa: BLE001
-                            log.warning("live preview worker failed to start", exc_info=True)
+                            if not self.disabled:
+                                log.warning("live preview worker failed to start", exc_info=True)
                             self.proc = None
                     continue
                 # Nothing queued and the prompt is over: hand the process's ~5 GB back.

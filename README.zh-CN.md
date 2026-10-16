@@ -9,8 +9,9 @@ H3 渲染采样时，本包在每一步取出采样器当前的潜变量，交�
 ## 安装
 
 1. 把本文件夹复制到 `ComfyUI/custom_nodes/`。
-2. 把 `taeh3.safetensors` 放进 `ComfyUI/models/vae_approx/`（官方 taeh3 权重，来自 [madebyollin/taehv](https://github.com/madebyollin/taehv)）。
-3. 重启 ComfyUI。编码使用 PyAV（`av`），ComfyUI 本身已要求安装，不需要另装 ffmpeg。
+2. 重启 ComfyUI。编码使用 PyAV（`av`），ComfyUI 本身已要求安装，不需要另装 ffmpeg。
+
+第一次跑 H3 渲染时，本包会自动下载 `taeh3.safetensors`（22 MB，官方权重，来自 [madebyollin/taehv](https://github.com/madebyollin/taehv/blob/main/safetensors/taeh3.safetensors)）到 `ComfyUI/models/vae_approx/`，并用固定的 SHA-256 校验。该目录里已有 `taeh3*` 文件时直接使用。需要离线使用时，第一次运行前自己把文件放进该目录。
 
 ## 使用
 

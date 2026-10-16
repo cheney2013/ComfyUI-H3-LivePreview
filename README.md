@@ -13,9 +13,12 @@ device-to-host copy of the latent per step.
 ## Install
 
 1. Copy this folder to `ComfyUI/custom_nodes/`.
-2. Place `taeh3.safetensors` in `ComfyUI/models/vae_approx/` (the official taeh3 weights from
-   [madebyollin/taehv](https://github.com/madebyollin/taehv)).
-3. Restart ComfyUI. Encoding uses PyAV (`av`), which ComfyUI already requires; no separate ffmpeg is needed.
+2. Restart ComfyUI. Encoding uses PyAV (`av`), which ComfyUI already requires; no separate ffmpeg is needed.
+
+The first time an H3 render runs, the pack downloads `taeh3.safetensors` (22 MB, the official weights from
+[madebyollin/taehv](https://github.com/madebyollin/taehv/blob/main/safetensors/taeh3.safetensors)) into
+`ComfyUI/models/vae_approx/` and checks it against a fixed SHA-256. If a `taeh3*` file is already there it is used
+as is. To work offline, place the file there yourself before the first run.
 
 ## Use
 
