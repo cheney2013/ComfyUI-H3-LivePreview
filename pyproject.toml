@@ -1,6 +1,6 @@
 [project]
 name = "comfyui-h3-live-preview"
-version = "1.0.0"
+version = "1.0.1"
 description = "Whole-clip sampling preview for MiniMax H3, decoded on the CPU with taeh3 so it costs no VRAM."
 license = { file = "LICENSE" }
 readme = "README.md"
